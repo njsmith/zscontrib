@@ -202,7 +202,12 @@ all: {% for subset in subsets | sort -%}
 
 .PHONY: sorted-{{ subset }} size-check-{{ subset }}
 
-{% set metadata = json_encode({"format": "google-books-2",
+{% set metadata = json_encode({"record-format": {
+                                 "type": "separated-values",
+                                 "separator": "\t",
+                                 "column-names": ["ngram", "year", "match_count", "volume_count"],
+                                 "column-types": ["utf8", "int", "int", "int"],
+                               },
                                "corpus": corpus_fullname,
                                "subset": subset}) %}
 
@@ -213,7 +218,7 @@ all: {% for subset in subsets | sort -%}
 \ttime $(PYTHON) -m zsscontrib.merge_sorted {% for url in urls[subset] | sort -%}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }} {% endfor -%}
 $(PIPE_PV) \
-| $(PYTHON) -m zss make $(ZSS_OPTS) - "$@" --metadata='{{ metadata}}'
+| $(PYTHON) -m zss make $(ZSS_OPTS) '{{ metadata }}' - "$@"
 
 sorted-{{ subset }}: {% for url in urls[subset] | sort -%}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }} {% endfor %}
@@ -236,7 +241,7 @@ sorted-{{ subset }}: {{ totalcountsgz }}
 
 {{ corpus_fullname }}-{{ subset }}.zss: sorted-{{ subset }} size-check-{{ subset }}
 \ttime gunzip -c {{ totalcountsgz }} \
-| $(PYTHON) -m zss make --metadata='{{ metadata}}' $(ZSS_OPTS) - "$@"
+| $(PYTHON) -m zss make '{{ metadata}}' - "$@" $(ZSS_OPTS)
 
 size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ subset }}
 \ttest $$(gunzip -c "{{ totalcountsgz }}" | wc -c) -ge 1000

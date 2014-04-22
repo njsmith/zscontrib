@@ -12,7 +12,6 @@ setup(
     version="0.0.0-dev",
     description=DESC,
     long_description=LONG_DESC,
-    long_description=LONG_DESC,
     author="Nathaniel J. Smith",
     author_email="njs@pobox.com",
     url="https://github.com/njsmith/zsscontrib",
