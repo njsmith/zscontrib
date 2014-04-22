@@ -1,11 +1,11 @@
-# This file is part of ZSS
+# This file is part of ZS
 # Copyright (C) 2013-2014 Nathaniel Smith <njs@pobox.com>
 # See file LICENSE.txt for license information.
 
 # A wrapper around GNU sort to merge pre-sorted compressed files.
 #
 # Usage:
-#   python -m zsscontrib.merge_sorted FILE1.gz FILE2.gz ...
+#   python -m zscontrib.merge_sorted FILE1.gz FILE2.gz ...
 # where each file is already sorted.
 #
 # Files can be .bz2, .gz, or raw.

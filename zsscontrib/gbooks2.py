@@ -1,4 +1,4 @@
-# This file is part of ZSS
+# This file is part of ZS
 # Copyright (C) 2013-2014 Nathaniel Smith <njs@pobox.com>
 # See file LICENSE.txt for license information.
 
@@ -156,7 +156,7 @@ def _fix_totalcounts(args):
 ################################################################
 
 MAKEFILE_TEMPLATE = """
-ZSS_OPTS :=
+ZS_OPTS :=
 SHELL := /bin/bash -e -o errexit -o pipefail
 PYTHON := {{ python }}
 TMPDIR := .
@@ -173,7 +173,7 @@ ifndef PV
 endif
 ifdef PV
   PIPE_PV = | $(PV) -rabtp
-  ZSS_OPTS += --no-spinner
+  ZS_OPTS += --no-spinner
 endif
 
 # You can override stuff here:
@@ -184,18 +184,18 @@ endif
 
 .PHONY: all
 all: {% for subset in subsets | sort -%}
-{{ corpus_fullname }}-{{ subset }}.zss {% endfor %}
+{{ corpus_fullname }}-{{ subset }}.zs {% endfor %}
 
 {{ corpus_fullname }}:
 \tmkdir {{ corpus_fullname }}
 
 {{ corpus_fullname }}/corpus-sizes.pickle: | {{ corpus_fullname }}
-\t${PYTHON} -m zsscontrib.gbooks2 _pickle-sizes "{{ corpus }}" "$@"
+\t${PYTHON} -m zscontrib.gbooks2 _pickle-sizes "{{ corpus }}" "$@"
 
 {% for subset in subsets | sort %}
 ### Makefile portion for subset: {{ subset }}
 .PHONY: {{ subset }}
-{{ subset }}: {{ corpus_fullname }}-{{ subset }}.zss
+{{ subset }}: {{ corpus_fullname }}-{{ subset }}.zs
 
 {{ corpus_fullname }}/{{ subset }}: | {{ corpus_fullname }}
 \tmkdir -p "$@"
@@ -214,17 +214,17 @@ all: {% for subset in subsets | sort -%}
 {% if subset != "0gram" %}
 # Standard sub-corpus (not zero-grams):
 
-{{ corpus_fullname }}-{{ subset }}.zss: sorted-{{ subset }} size-check-{{ subset }}
-\ttime $(PYTHON) -m zsscontrib.merge_sorted {% for url in urls[subset] | sort -%}
+{{ corpus_fullname }}-{{ subset }}.zs: sorted-{{ subset }} size-check-{{ subset }}
+\ttime $(PYTHON) -m zscontrib.merge_sorted {% for url in urls[subset] | sort -%}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }} {% endfor -%}
 $(PIPE_PV) \
-| $(PYTHON) -m zss make $(ZSS_OPTS) '{{ metadata }}' - "$@"
+| $(PYTHON) -m zs make $(ZS_OPTS) '{{ metadata }}' - "$@"
 
 sorted-{{ subset }}: {% for url in urls[subset] | sort -%}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }} {% endfor %}
 
 size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ subset }}
-\t$(PYTHON) -m zsscontrib.gbooks2 _size-check "{{ corpus_fullname }}/{{ subset }}" "{{ subset }}" "{{ corpus_fullname }}/corpus-sizes.pickle"
+\t$(PYTHON) -m zscontrib.gbooks2 _size-check "{{ corpus_fullname }}/{{ subset }}" "{{ subset }}" "{{ corpus_fullname }}/corpus-sizes.pickle"
 
 {% for url in urls[subset] | sort %}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }}: | {{ corpus_fullname }}/{{ subset }}
@@ -239,15 +239,15 @@ size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ sub
     = "%s/%s/sorted-%s.gz" % (corpus_fullname, subset, basename(totalcounts_url)) %}
 sorted-{{ subset }}: {{ totalcountsgz }}
 
-{{ corpus_fullname }}-{{ subset }}.zss: sorted-{{ subset }} size-check-{{ subset }}
+{{ corpus_fullname }}-{{ subset }}.zs: sorted-{{ subset }} size-check-{{ subset }}
 \ttime gunzip -c {{ totalcountsgz }} \
-| $(PYTHON) -m zss make '{{ metadata}}' - "$@" $(ZSS_OPTS)
+| $(PYTHON) -m zs make '{{ metadata}}' - "$@" $(ZS_OPTS)
 
 size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ subset }}
 \ttest $$(gunzip -c "{{ totalcountsgz }}" | wc -c) -ge 1000
 
 {{ totalcountsgz }}: | {{ corpus_fullname }}/{{ subset }}
-\ttime $(CURL) "{{ totalcounts_url }}" | $(PYTHON) -m zsscontrib.gbooks2 _fix-totalcounts | gzip -1 -c > "$@"
+\ttime $(CURL) "{{ totalcounts_url }}" | $(PYTHON) -m zscontrib.gbooks2 _fix-totalcounts | gzip -1 -c > "$@"
 
 {% endif %}
 
@@ -328,9 +328,9 @@ def _make_makefile(args):
     corpus, = args
     write_makefile(corpus)
 
-# Invocation as python -m zsscontrib.gbooks2
+# Invocation as python -m zscontrib.gbooks2
 # Note that in this case this code may be executed twice, once in the __main__
-# namespace and once in the 'zsscontrib.gbooks2' namespace.
+# namespace and once in the 'zscontrib.gbooks2' namespace.
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         sys.stderr.write("Need at least one argument!")
