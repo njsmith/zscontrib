@@ -8,7 +8,7 @@ LONG_DESC = (DESC + "\n"
              "include similar scripts here as well.")
 
 setup(
-    name="zs",
+    name="zscontrib",
     version="0.0.0-dev",
     description=DESC,
     long_description=LONG_DESC,
