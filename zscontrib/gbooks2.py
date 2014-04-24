@@ -333,7 +333,7 @@ def _make_makefile(args):
 # namespace and once in the 'zscontrib.gbooks2' namespace.
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        sys.stderr.write("Need at least one argument!")
+        sys.stderr.write("Need at least one argument!\n")
     elif sys.argv[1] == "_fix-totalcounts":
         _fix_totalcounts(sys.argv[2:])
     elif sys.argv[1] == "_size-check":
