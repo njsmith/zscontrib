@@ -228,8 +228,8 @@ size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ sub
 
 {% for url in urls[subset] | sort %}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }}: | {{ corpus_fullname }}/{{ subset }}
-\ttime $(CURL) "{{ url }}" | gunzip -c | $(SORT) | gzip -1 -c > "tmp-$@"
-\tmv "tmp-$@" "$@"
+\ttime $(CURL) "{{ url }}" | gunzip -c | $(SORT) | gzip -1 -c > "$@.tmp"
+\tmv "$@.tmp" "$@"
 {% endfor %}
 
 {% else %}
@@ -248,8 +248,8 @@ size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ sub
 \ttest $$(gunzip -c "{{ totalcountsgz }}" | wc -c) -ge 1000
 
 {{ totalcountsgz }}: | {{ corpus_fullname }}/{{ subset }}
-\ttime $(CURL) "{{ totalcounts_url }}" | $(PYTHON) -m zscontrib.gbooks2 _fix-totalcounts | gzip -1 -c > "tmp-$@"
-\tmv "tmp-$@" "$@"
+\ttime $(CURL) "{{ totalcounts_url }}" | $(PYTHON) -m zscontrib.gbooks2 _fix-totalcounts | gzip -1 -c > "$@.tmp"
+\tmv "$@.tmp" "$@"
 
 {% endif %}
 
