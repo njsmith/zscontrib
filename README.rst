@@ -19,7 +19,7 @@ Nice to have: lzop, `pv <http://www.ivarch.com/programs/pv.shtml>`_
 
 Install this package::
 
-    pip install https://github.com/njsmith/zscontrib.git
+    pip install git+https://github.com/njsmith/zscontrib.git
 
 Then generate a makefile for the subcorpus you want::
 
