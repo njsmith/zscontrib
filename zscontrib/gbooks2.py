@@ -200,7 +200,7 @@ all: {% for subset in subsets | sort -%}
 {{ corpus_fullname }}/{{ subset }}: | {{ corpus_fullname }}
 \tmkdir -p "$@"
 
-.PHONY: sorted-{{ subset }} size-check-{{ subset }}
+.PHONY: sorted-{{ subset }} size-check-{{ subset }} sorted-{{ subset }}-backwards
 
 {% set metadata = json_encode({"record-format": {
                                  "type": "separated-values",
@@ -223,6 +223,9 @@ $(PIPE_PV) \
 sorted-{{ subset }}: {% for url in urls[subset] | sort -%}
 {{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }} {% endfor %}
 
+sorted-{{ subset }}-backwards: {% for url in urls[subset] | sort | reverse -%}
+{{ corpus_fullname }}/{{ subset }}/sorted-{{ basename(url) }} {% endfor %}
+
 size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ subset }}
 \t$(PYTHON) -m zscontrib.gbooks2 _size-check "{{ corpus_fullname }}/{{ subset }}" "{{ subset }}" "{{ corpus_fullname }}/corpus-sizes.pickle"
 
@@ -239,6 +242,7 @@ size-check-{{ subset }}: {{ corpus_fullname }}/corpus-sizes.pickle sorted-{{ sub
 {% set totalcountsgz
     = "%s/%s/sorted-%s.gz" % (corpus_fullname, subset, basename(totalcounts_url)) %}
 sorted-{{ subset }}: {{ totalcountsgz }}
+sorted-{{ subset }}-backwards: {{ totalcountsgz }}
 
 {{ corpus_fullname }}-{{ subset }}.zs: sorted-{{ subset }} size-check-{{ subset }}
 \ttime gunzip -c {{ totalcountsgz }} \
